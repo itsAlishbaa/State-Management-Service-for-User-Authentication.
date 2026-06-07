@@ -1,5 +1,48 @@
-﻿<h3>UserProfile</h3>
+﻿@page "/auth-profile"
+@inject AuthenticationStateService AuthService
+@implements IDisposable
+@attribute [RenderModeInteractiveServer]
+
+<div class="dashboard-viewport">
+    <div class="premium-dark-card">
+        <div class="card-header">
+            <h2>User Profile Stream</h2>
+            <p>Shared responsive node state monitoring</p>
+        </div>
+
+        <div class="profile-card-content">
+            @if (AuthService.IsAuthenticated)
+            {
+                <div class="user-avatar-glow"></div>
+                <h2 class="welcome-heading">Welcome Back, Agent</h2>
+                <p class="profile-meta">Clearance Level: Tier-1 Administrator</p>
+                <div class="secure-token-box">
+                    <span>Secure Token Active</span>
+                </div>
+            }
+            else
+            {
+                <div class="user-avatar-dead"></div>
+                <h2 class="anonymous-heading">Identity Unknown</h2>
+                <p class="profile-meta-warn">No active server profile detected.</p>
+                <div class="warning-alert-box">
+                    <p>Please navigate to the Security Terminal and initiate Log In authorization.</p>
+                </div>
+            }
+        </div>
+    </div>
+</div>
 
 @code {
+    protected override void OnInitialized()
+    {
+        AuthService.OnStateChanged += InvokeAsyncStateHasChanged;
+    }
 
+    private void InvokeAsyncStateHasChanged() => InvokeAsync(StateHasChanged);
+
+    public void Dispose()
+    {
+        AuthService.OnStateChanged -= InvokeAsyncStateHasChanged;
+    }
 }
