@@ -1,7 +1,79 @@
 ﻿@page "/"
+@inject AuthenticationStateService AuthService
+@implements IDisposable
+@attribute [RenderModeInteractiveServer]
 
-<PageTitle>Home</PageTitle>
+<div class="dashboard-viewport">
+    <div class="premium-dark-card">
+        <div class="card-header-block">
+            <h2 class="terminal-title">Security Control Hub</h2>
+            <p class="terminal-subtitle">Simulate instant server-side authorization handshake</p>
+        </div>
 
-<h1>Hello, world!</h1>
+        <div class="display-metric-box">
+            <span class="metric-label">System Gateway</span>
+            @if (AuthService.IsAuthenticated)
+            {
+                <div class="status-badge status-online">ACCESS GRANTED</div>
+            }
+            else
+            {
+                <div class="status-badge status-offline">LOCKED OUT</div>
+            }
+        </div>
 
-Welcome to your new app.
+        <div class="profile-stream-section">
+            @if (AuthService.IsAuthenticated)
+            {
+                <div class="avatar-container">
+                    <div class="user-avatar-glow"></div>
+                </div>
+                <h2 class="welcome-heading">Welcome Back, Agent</h2>
+                <p class="profile-meta">Clearance Level: Tier-1 Administrator</p>
+                <div class="secure-token-wrapper">
+                    <span class="secure-token-box">Secure Token Active</span>
+                </div>
+            }
+            else
+            {
+                <div class="avatar-container">
+                    <div class="user-avatar-dead"></div>
+                </div>
+                <h2 class="anonymous-heading">Identity Unknown</h2>
+                <p class="profile-meta-warn">No active server profile detected.</p>
+                <div class="warning-alert-box">
+                    <p>Please use the terminal button below to initiate authorization.</p>
+                </div>
+            }
+        </div>
+
+        <div class="action-grid">
+            @if (!AuthService.IsAuthenticated)
+            {
+                <button class="action-btn-main btn-glow-purple" @onclick="AuthService.LogIn">
+                    Initialize Log In
+                </button>
+            }
+            else
+            {
+                <button class="action-btn-main btn-glow-red" @onclick="AuthService.LogOut">
+                    Kill Session (Log Out)
+                </button>
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    protected override void OnInitialized()
+    {
+        AuthService.OnStateChanged += RefreshUI;
+    }
+
+    private void RefreshUI() => InvokeAsync(StateHasChanged);
+
+    public void Dispose()
+    {
+        AuthService.OnStateChanged -= RefreshUI;
+    }
+}
