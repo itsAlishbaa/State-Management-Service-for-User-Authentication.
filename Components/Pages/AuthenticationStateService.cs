@@ -1,6 +1,28 @@
-﻿namespace Q5.Components.Pages
+﻿using System;
+
+public class AuthenticationStateService
 {
-    public class AuthenticationStateService
+    public bool IsAuthenticated { get; private set; } = false;
+
+    public event Action? OnStateChanged;
+
+    public void LogIn()
     {
+        if (!IsAuthenticated)
+        {
+            IsAuthenticated = true;
+            NotifyStateChanged();
+        }
     }
+
+    public void LogOut()
+    {
+        if (IsAuthenticated)
+        {
+            IsAuthenticated = false;
+            NotifyStateChanged();
+        }
+    }
+
+    private void NotifyStateChanged() => OnStateChanged?.Invoke();
 }
