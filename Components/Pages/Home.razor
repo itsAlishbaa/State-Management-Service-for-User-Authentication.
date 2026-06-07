@@ -1,65 +1,46 @@
 ﻿@page "/"
+@using Q5.Services
 @inject AuthenticationStateService AuthService
 @implements IDisposable
+
 @rendermode InteractiveServer
 
-<div class="dashboard-viewport">
-    <div class="premium-dark-card">
-        <div class="card-header-block">
-            <h2 class="terminal-title">Security Control Hub</h2>
-            <p class="terminal-subtitle">Simulate instant server-side authorization handshake</p>
-        </div>
+<PageTitle>Home</PageTitle>
 
-        <div class="display-metric-box">
-            <span class="metric-label">System Gateway</span>
-            @if (AuthService.IsAuthenticated)
-            {
-                <div class="status-badge status-online">ACCESS GRANTED</div>
-            }
-            else
-            {
-                <div class="status-badge status-offline">LOCKED OUT</div>
-            }
-        </div>
+<div class="container py-5 text-center">
+    <div class="p-5 mb-4 bg-light rounded-3 shadow-sm border">
+        <div class="container-fluid py-5">
+            <h1 class="display-5 fw-bold text-dark mb-3">Welcome to Blazor State Management</h1>
+            <p class="col-md-8 mx-auto fs-5 text-muted">
+                This app demonstrates how a shared Singleton service instantly syncs user authentication across different independent pages.
+            </p>
 
-        <div class="profile-stream-section">
-            @if (AuthService.IsAuthenticated)
-            {
-                <div class="avatar-container">
-                    <div class="user-avatar-glow"></div>
-                </div>
-                <h2 class="welcome-heading">Welcome Back, Agent</h2>
-                <p class="profile-meta">Clearance Level: Tier-1 Administrator</p>
-                <div class="secure-token-wrapper">
-                    <span class="secure-token-box">Secure Token Active</span>
-                </div>
-            }
-            else
-            {
-                <div class="avatar-container">
-                    <div class="user-avatar-dead"></div>
-                </div>
-                <h2 class="anonymous-heading">Identity Unknown</h2>
-                <p class="profile-meta-warn">No active server profile detected.</p>
-                <div class="warning-alert-box">
-                    <p>Please use the terminal button below to initiate authorization.</p>
-                </div>
-            }
-        </div>
+            <hr class="my-4 mx-auto" style="max-width: 300px;" />
 
-        <div class="action-grid">
-            @if (!AuthService.IsAuthenticated)
-            {
-                <button class="action-btn-main btn-glow-purple" @onclick="AuthService.LogIn">
-                    Initialize Log In
-                </button>
-            }
-            else
-            {
-                <button class="action-btn-main btn-glow-red" @onclick="AuthService.LogOut">
-                    Kill Session (Log Out)
-                </button>
-            }
+            <div class="mb-4">
+                <span class="fs-6 text-uppercase fw-bold tracking-wider text-muted d-block mb-2">Current System State</span>
+                @if (AuthService.IsAuthenticated)
+                {
+                    <span class="badge bg-success p-3 fs-6 rounded-pill shadow-sm">
+                        <i class="bi bi-shield-check me-2"></i>User Session Authenticated
+                    </span>
+                }
+                else
+                {
+                    <span class="badge bg-secondary p-3 fs-6 rounded-pill shadow-sm">
+                        <i class="bi bi-shield-lock me-2"></i>Anonymous / Public Access
+                    </span>
+                }
+            </div>
+
+            <div class="d-grid gap-2 d-sm-flex justify-content-sm-center mt-4">
+                <a href="/login" class="btn btn-primary btn-lg px-4 gap-3 shadow">
+                    <i class="bi bi-person-fill-gear me-2"></i>Go to Portal
+                </a>
+                <a href="/profile" class="btn btn-outline-secondary btn-lg px-4">
+                    <i class="bi bi-person-bounding-box me-2"></i>View Profile
+                </a>
+            </div>
         </div>
     </div>
 </div>
@@ -67,13 +48,11 @@
 @code {
     protected override void OnInitialized()
     {
-        AuthService.OnStateChanged += RefreshUI;
+        AuthService.OnChange += StateHasChanged;
     }
-
-    private void RefreshUI() => InvokeAsync(StateHasChanged);
 
     public void Dispose()
     {
-        AuthService.OnStateChanged -= RefreshUI;
+        AuthService.OnChange -= StateHasChanged;
     }
 }

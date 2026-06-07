@@ -1,32 +1,35 @@
-﻿@page "/auth-profile"
+﻿@page "/profile"
+@using Q5.Services
 @inject AuthenticationStateService AuthService
 @implements IDisposable
+
 @rendermode InteractiveServer
 
-<div class="dashboard-viewport">
-    <div class="premium-dark-card">
-        <div class="card-header">
-            <h2>User Profile Stream</h2>
-            <p>Shared responsive node state monitoring</p>
-        </div>
-
-        <div class="profile-card-content">
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-6">
             @if (AuthService.IsAuthenticated)
             {
-                <div class="user-avatar-glow"></div>
-                <h2 class="welcome-heading">Welcome Back, Agent</h2>
-                <p class="profile-meta">Clearance Level: Tier-1 Administrator</p>
-                <div class="secure-token-box">
-                    <span>Secure Token Active</span>
+                <div class="alert alert-success d-flex align-items-center p-4 shadow-sm border-0" role="alert" style="border-radius: 15px;">
+                    <div class="me-3 fs-1">
+                        🚀
+                    </div>
+                    <div>
+                        <h4 class="alert-heading fw-bold mb-1">Welcome Back, User!</h4>
+                        <p class="mb-0 text-muted">You have successfully bypassed the matrix. Enjoy your secure dashboard.</p>
+                    </div>
                 </div>
             }
             else
             {
-                <div class="user-avatar-dead"></div>
-                <h2 class="anonymous-heading">Identity Unknown</h2>
-                <p class="profile-meta-warn">No active server profile detected.</p>
-                <div class="warning-alert-box">
-                    <p>Please navigate to the Security Terminal and initiate Log In authorization.</p>
+                <div class="alert alert-warning d-flex align-items-center p-4 shadow-sm border-0" role="alert" style="border-radius: 15px;">
+                    <div class="me-3 fs-1">
+                        🔒
+                    </div>
+                    <div>
+                        <h4 class="alert-heading fw-bold mb-1">Access Restricted</h4>
+                        <p class="mb-0 text-muted">Please head over to the <a href="/login" class="alert-link text-decoration-underline">Login Page</a> to authenticate yourself.</p>
+                    </div>
                 </div>
             }
         </div>
@@ -36,13 +39,11 @@
 @code {
     protected override void OnInitialized()
     {
-        AuthService.OnStateChanged += InvokeAsyncStateHasChanged;
+        AuthService.OnChange += StateHasChanged;
     }
-
-    private void InvokeAsyncStateHasChanged() => InvokeAsync(StateHasChanged);
 
     public void Dispose()
     {
-        AuthService.OnStateChanged -= InvokeAsyncStateHasChanged;
+        AuthService.OnChange -= StateHasChanged;
     }
 }

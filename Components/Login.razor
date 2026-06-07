@@ -1,54 +1,49 @@
-﻿@page "/auth-gate"
+﻿@page "/login"
+@using Q5.Services
 @inject AuthenticationStateService AuthService
 @implements IDisposable
+
 @rendermode InteractiveServer
 
-<div class="dashboard-viewport">
-    <div class="premium-dark-card">
-        <div class="card-header">
-            <h2>Security Terminal</h2>
-            <p>Simulate instant server-side authorization handshake</p>
-        </div>
+<div class="card shadow-sm m-4" style="max-width: 400px; border-radius: 12px;">
+    <div class="card-body text-center p-4">
+        <h3 class="card-title mb-4 fw-bold text-secondary">Account Portal</h3>
 
-        <div class="display-metric-box">
-            <span class="metric-label">System Gateway</span>
+        <div class="mb-4">
+            Status:
             @if (AuthService.IsAuthenticated)
             {
-                <h3 class="status-badge status-online">ACCESS GRANTED</h3>
+                <span class="badge bg-success fs-6">Active Session</span>
             }
             else
             {
-                <h3 class="status-badge status-offline">LOCKED OUT</h3>
+                <span class="badge bg-danger fs-6">Logged Out</span>
             }
         </div>
 
-        <div class="action-grid">
-            @if (!AuthService.IsAuthenticated)
-            {
-                <button class="action-btn-main btn-glow-purple" @onclick="AuthService.LogIn">
-                    Initialize Log In
-                </button>
-            }
-            else
-            {
-                <button class="action-btn-main btn-glow-red" @onclick="AuthService.LogOut">
-                    Kill Session (Log Out)
-                </button>
-            }
-        </div>
+        @if (!AuthService.IsAuthenticated)
+        {
+            <button class="btn btn-primary btn-lg w-100 shadow" @onclick="AuthService.LogIn">
+                <i class="bi bi-box-arrow-in-right me-2"></i> Log In
+            </button>
+        }
+        else
+        {
+            <button class="btn btn-outline-danger btn-lg w-100 shadow-sm" @onclick="AuthService.LogOut">
+                <i class="bi bi-box-arrow-left me-2"></i> Log Out
+            </button>
+        }
     </div>
 </div>
 
 @code {
     protected override void OnInitialized()
     {
-        AuthService.OnStateChanged += InvokeAsyncStateHasChanged;
+        AuthService.OnChange += StateHasChanged;
     }
-
-    private void InvokeAsyncStateHasChanged() => InvokeAsync(StateHasChanged);
 
     public void Dispose()
     {
-        AuthService.OnStateChanged -= InvokeAsyncStateHasChanged;
+        AuthService.OnChange -= StateHasChanged;
     }
 }
