@@ -1,58 +1,42 @@
 ﻿@page "/"
-@using Q5.Services
+@using BlazorAuthDemo.Services
 @inject AuthenticationStateService AuthService
 @implements IDisposable
 
-@rendermode InteractiveServer
-
 <PageTitle>Home</PageTitle>
 
-<div class="container py-5 text-center">
-    <div class="p-5 mb-4 bg-light rounded-3 shadow-sm border">
-        <div class="container-fluid py-5">
-            <h1 class="display-5 fw-bold text-dark mb-3">Welcome to Blazor State Management</h1>
-            <p class="col-md-8 mx-auto fs-5 text-muted">
-                This app demonstrates how a shared Singleton service instantly syncs user authentication across different independent pages.
-            </p>
+<div class="container d-flex justify-content-center align-items-center" style="min-height: 70vh;">
+    <div class="card p-5 shadow-sm text-center border-0 bg-white style-card" style="max-width: 600px; width: 100%; border-radius: 16px;">
+        
+        <div class="d-flex justify-content-center align-items-center mb-4 gap-2">
+            @if (AuthService.IsAuthenticated)
+            {
+                <div class="d-inline-flex align-items-center px-3 py-1 bg-success-subtle text-success border border-success-subtle rounded-pill small fw-semibold">
+                    <span class="bg-success rounded-circle me-2" style="width: 8px; height: 8px;"></span>
+                    Logged In
+                </div>
+            }
+            else
+            {
+                <div class="d-inline-flex align-items-center px-3 py-1 bg-secondary-subtle text-secondary border border-secondary-subtle rounded-pill small fw-semibold">
+                    <span class="bg-secondary rounded-circle me-2" style="width: 8px; height: 8px;"></span>
+                    Logged Out
+                </div>
+            }
+        </div>
 
-            <hr class="my-4 mx-auto" style="max-width: 300px;" />
+        <h1 class="fw-bold text-dark mb-3 h2">Welcome to App Dashboard</h1>
+        <p class="text-muted mb-4 px-3 fs-6">
+            Manage your account profile, check your current session details, and test out our internal real-time application state synchronization.
+        </p>
 
-            <div class="mb-4">
-                <span class="fs-6 text-uppercase fw-bold tracking-wider text-muted d-block mb-2">Current System State</span>
-                @if (AuthService.IsAuthenticated)
-                {
-                    <span class="badge bg-success p-3 fs-6 rounded-pill shadow-sm">
-                        <i class="bi bi-shield-check me-2"></i>User Session Authenticated
-                    </span>
-                }
-                else
-                {
-                    <span class="badge bg-secondary p-3 fs-6 rounded-pill shadow-sm">
-                        <i class="bi bi-shield-lock me-2"></i>Anonymous / Public Access
-                    </span>
-                }
-            </div>
-
-            <div class="d-grid gap-2 d-sm-flex justify-content-sm-center mt-4">
-                <a href="/login" class="btn btn-primary btn-lg px-4 gap-3 shadow">
-                    <i class="bi bi-person-fill-gear me-2"></i>Go to Portal
-                </a>
-                <a href="/profile" class="btn btn-outline-secondary btn-lg px-4">
-                    <i class="bi bi-person-bounding-box me-2"></i>View Profile
-                </a>
-            </div>
+        <div class="d-flex gap-3 justify-content-center pt-2">
+            <a href="/login" class="btn btn-primary px-4 py-2 fw-medium shadow-sm" style="border-radius: 8px;">
+                Manage Session
+            </a>
+            <a href="/profile" class="btn btn-outline-secondary px-4 py-2 fw-medium" style="border-radius: 8px;">
+                View Profile
+            </a>
         </div>
     </div>
 </div>
-
-@code {
-    protected override void OnInitialized()
-    {
-        AuthService.OnChange += StateHasChanged;
-    }
-
-    public void Dispose()
-    {
-        AuthService.OnChange -= StateHasChanged;
-    }
-}
